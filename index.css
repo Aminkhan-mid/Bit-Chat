@@ -45,7 +45,8 @@ p{
     margin-top: 1em;
     width: 90%;
     height: 50px;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    font-weight: bold;
     border-radius: 1em;
     cursor: pointer;
     background:#B6C2D9;
