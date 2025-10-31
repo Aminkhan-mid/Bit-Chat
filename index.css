@@ -6,4 +6,41 @@
 body{
     background: #000d02;
     color: #00ff44;
+    font-family: 'PF Tempesta Five', sans-serif;   
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+header{
+    margin-bottom: 2em;
+}
+.bitchat-icon{
+    width: 130px;
+}
+h1{
+    width: fit-content;
+}
+span{
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+.icon{
+    width: 50px;
+    border-radius: 50%;
+    padding: 0.5em;
+}
+
+p{
+    color: aliceblue;
+}
+
+.being-btn{
+    border: none;
+    margin-top: 1em;
+    width: 90%;
+    height: 50px;
+    font-size: 1.4rem;
+    border-radius: 1em;
 }
