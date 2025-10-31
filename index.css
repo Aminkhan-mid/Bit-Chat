@@ -15,8 +15,10 @@ body{
     margin-top: -40px;
 }
 header{
+    margin-left: -98px;
     margin-bottom: 2em;
 }
+
 .bitchat-icon{
     width: 130px;
     filter: drop-shadow(0px 0px 3px white);
