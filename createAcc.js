@@ -61,7 +61,7 @@ function showAccountCreated() {
         window.location.href = "./home.html"
     }, 3000)
 
-    }, 30000)
+    }, 3000)
 })
 
 
