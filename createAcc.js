@@ -1,6 +1,10 @@
+export {userDetails}
 const createAccBtn = document.getElementById("createAcc-btn")
 const createAccBody = document.getElementById("createAcc-body")
 const usernameInput = document.getElementById("username-input")
+const savedUserName = localStorage.getItem("userName") || "Local storage is empty."
+const savedUserPfp = localStorage.getItem("pfpSrc") || "Local storage is empty."
+
 
 usernameInput.addEventListener("input", ()=> {
     if(usernameInput.value.trim() !== ""){
@@ -11,8 +15,6 @@ usernameInput.addEventListener("input", ()=> {
 })
 
 
-
-
 function getMatchingIcon(){
     document.addEventListener("click", (e) => {
         if(!e.target.classList.contains("pfps-icon")) return
@@ -20,6 +22,7 @@ function getMatchingIcon(){
         document.querySelectorAll(".pfps-icon").forEach( (m) => {
             if(m.id === e.target.id) {
                 m.style.border = "2px solid yellow"
+                localStorage.setItem("pfpSrc", m.src)
             } else{
                 m.style.border = "1px solid gainsboro"
             }
@@ -46,6 +49,7 @@ function showAccountCreated() {
       <p>@${usernameInput.value}</p>
       <h2>Account Created 🥳</h2>
     </div>`;
+    localStorage.setItem("userName", usernameInput.value)
 }
 
  createAccBtn.addEventListener("click", ()=>{
@@ -69,4 +73,9 @@ let selectedIconSrc = null
 let selectedIconAlt = null
 getMatchingIcon()
 
-//  createAccBody.innerHTML = window.location.href = "./home.html"}, 10000)
+const userDetails = {
+    name: savedUserName,
+    src: savedUserPfp
+}
+console.log("Create Account:", userDetails)
+

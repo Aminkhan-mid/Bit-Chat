@@ -9,3 +9,26 @@ body{
     font-family: sans-serif;
     height: 100vh;
 }
+nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    background: #A52422;
+}
+nav span{
+    display: flex; 
+    align-items: center;
+    margin: 1em;
+    gap: 0.5em;
+}
+nav img{
+    width: 25px;
+}
+nav p{
+    font-size: 1rem;
+    margin-top:4px;
+}
+nav div{
+
+    padding: 1em;
+}
