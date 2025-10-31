@@ -32,16 +32,19 @@ function getMatchingIcon(){
 function buildingProfile(){
     document.getElementById("building-profile").innerHTML = `
     <div class="creating-account">
-            <img src="./imgs/robotic-arm.gif" alt="skull">
+            <img src="./imgs/CubeShapeGif.gif" alt="skull">
     </div>`
     createAccBtn.innerHTML = "Building Profile..."
+    createAccBtn.style.cursor = "none"
 }
 
 function showAccountCreated() {
   createAccBody.innerHTML = `
+  <img class="confettiGif" src="./imgs/confettiGif.gif">
     <div class="account-created">
-      <img class="pfps-icon" src="${selectedIconSrc}" alt="${selectedIconAlt}">
+      <img class="selected-icon" src="${selectedIconSrc}" alt="${selectedIconAlt}">
       <p>@${usernameInput.value}</p>
+      <h2>Account Created 🥳</h2>
     </div>`;
 }
 
@@ -51,7 +54,14 @@ function showAccountCreated() {
         return
     }
     buildingProfile()
-    setTimeout(() => {showAccountCreated()}, 2000)
+    setTimeout(() => {
+        showAccountCreated()
+    
+    setTimeout(()=> {
+        window.location.href = "./home.html"
+    }, 3000)
+
+    }, 30000)
 })
 
 

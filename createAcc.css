@@ -95,18 +95,30 @@ span p{
     height: 30vh;
 }
 .creating-account img{
-    width: 200px;
-    border-radius: 2em;
+    width: 250px;
 }
 .account-created{
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100vh;
     align-items: center;
 }
-
+.confettiGif{
+    height: 70vh;
+    width: 100%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.selected-icon{
+    background: #2a2a2a;
+    width: 150px;
+    border-radius: 2em;
+    padding: 0.5em;
+}
 .account-created p{
     font-size: 2rem;
-    margin-top: 1.5em;
+    margin-top: 1em;
 }
