@@ -40,7 +40,7 @@ main{
     overflow: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
-    margin-bottom: 3em;
+    border: 1px solid yellow;
 }
 section {
     margin: 1em;
@@ -66,7 +66,6 @@ section {
     border: 1px solid #404b42;
     width: 90%;
     height: 60px;
-    margin: 1em auto;
     padding: 0.5em;
     border-radius: 2em;
     position: fixed;
@@ -74,6 +73,7 @@ section {
     left: 50%;
     transform: translate(-50%, -10%);
     background-color: #000d02;
+    margin: 1em auto;
 }
 input{
     color: #DDA77B;
