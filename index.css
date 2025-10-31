@@ -47,4 +47,6 @@ p{
     height: 50px;
     font-size: 1.4rem;
     border-radius: 1em;
+    cursor: pointer;
+    background:#B6C2D9;
 }
