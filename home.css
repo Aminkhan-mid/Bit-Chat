@@ -36,7 +36,7 @@ nav div{
     padding: 1em;
 }
 main{
-    height: 70vh;
+    height: 75vh;
     overflow: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
