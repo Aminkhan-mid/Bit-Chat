@@ -1,4 +1,3 @@
-export {userDetails}
 const createAccBtn = document.getElementById("createAcc-btn")
 const createAccBody = document.getElementById("createAcc-body")
 const usernameInput = document.getElementById("username-input")
@@ -73,9 +72,6 @@ let selectedIconSrc = null
 let selectedIconAlt = null
 getMatchingIcon()
 
-const userDetails = {
-    name: savedUserName,
-    src: savedUserPfp
-}
-console.log("Create Account:", userDetails)
+
+
 
