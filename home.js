@@ -12,8 +12,8 @@ nav.innerHTML = `
         </span>
         <div>
             <img src="./imgs/stash--save-ribbon-solid.png" alt="saved">
-            <img src="./imgs/jam--world.png" alt="world">
-            <img src="./imgs/icon-park-solid--peoples-two.png" alt="all users">
+            <img src="./imgs/jam--world.png" alt="world"> 
+            <img src="./imgs/icon-park-solid--peoples-two.png" alt="all users"> 
         </div>
     </nav>
 `

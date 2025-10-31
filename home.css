@@ -7,7 +7,7 @@ body{
     background: #000d02;
     color: white;
     font-family: sans-serif;
-    height: 100vh;
+
 }
 nav{
     display: flex;
@@ -34,4 +34,68 @@ nav p{
 }
 nav div{
     padding: 1em;
+}
+main{
+    height: 79vh;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+section {
+    margin: 1em;
+}
+.user-name{
+    color: #a92ad2;
+    margin-bottom: 0.5em;
+}
+.user-text{
+    margin-bottom: 0.5em;
+    color: white;
+    line-height: 1.5;
+}
+.text-time{
+    opacity: 50%;
+    font-size: 0.8rem;
+}
+
+.input-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #404b42;
+    width: 90%;
+    height: 60px;
+    margin: 1em auto;
+    padding: 0.5em;
+    border-radius: 2em;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -10%);
+    background-color: #000d02;
+}
+input{
+    color: #DDA77B;
+    background: transparent;
+    border: none;
+    width: 80%;
+    height: 50px;
+    outline: none;
+    margin-left: 1em;
+    font-size: 1.2rem;
+}
+.back-div{
+    background: #404b42;
+    width:40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.span-flex{
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
 }
