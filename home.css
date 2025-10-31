@@ -36,11 +36,10 @@ nav div{
     padding: 1em;
 }
 main{
-    height: 75vh;
+    height: 70vh;
     overflow: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
-    border: 1px solid yellow;
 }
 section {
     margin: 1em;
@@ -73,6 +72,7 @@ section {
     left: 50%;
     transform: translate(-50%, -10%);
     background-color: #000d02;
+    margin: 0.5em auto;
 }
 input{
     color: #DDA77B;
