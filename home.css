@@ -73,7 +73,6 @@ section {
     left: 50%;
     transform: translate(-50%, -10%);
     background-color: #000d02;
-    margin: 1em auto;
 }
 input{
     color: #DDA77B;
