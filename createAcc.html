@@ -11,7 +11,7 @@
     <link rel="manifest" href="./favicon_io/site.webmanifest">
     <link href="https://fonts.cdnfonts.com/css/pf-tempesta-five" rel="stylesheet">
 </head>
-<body>
+<body id="createAcc-body">
     <header>
         <p>Create your profile</p>
         <img class="bitchat-icon" src="./folder.png" alt="bit chat folder">
@@ -30,19 +30,21 @@
                 <img class="pfps-icon" src="./imgs/solar--fire-bold-duotone.png" alt="fire">
                 <img class="pfps-icon" src="./imgs/mingcute--tree-4-fill.png" alt="tree">
                 <img class="pfps-icon" src="./imgs/ic--round-bolt.png" alt="bolt">
-                <img class="pfps-icon" src="./imgs/streamline-flex--skull-2-solid.png" alt="skull">
+                <img class="pfps-icon skull" src="./imgs/streamline-flex--skull-2-solid.png" alt="skull">
                 <img class="pfps-icon" src="./imgs/game-icons--double-dragon.png" alt="dragon">
            
             </div>
         </div>
 
         <p class="p-Two">User name</p>
-        <input class="username-input" type="text" placeholder="@Timurthelame">
-        
-        <button id="createAcc-btn" class="createAcc-btn">Create Account</button>
+        <input id="username-input" class="username-input" type="text" placeholder="@Timurthelame" required>
+
+        <div id="building-profile"></div>
+
+        <button disabled id="createAcc-btn" class="createAcc-btn">Create Account</button>
     </main>
 
 
-    <script src="./index.js"></script>
+    <script src="./createAcc.js"></script>
 </body>
 </html>

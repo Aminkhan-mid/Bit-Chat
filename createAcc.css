@@ -20,7 +20,7 @@ header p{
 }
 .bitchat-icon{
     width: 60px;
-    filter: drop-shadow(0px 0px 3px white);
+    filter: drop-shadow(0px 0px 3px lime);
 }
 span{
     display: flex;
@@ -57,7 +57,9 @@ span p{
     border: 1px solid gainsboro;
     border-radius: 0.5em;
     background: #2a2a2a;
+    padding: 0.5em;
 }
+
 .username-input{
     border: 2px solid #d3f36b;
     background:#2a2a2a;
@@ -77,10 +79,33 @@ span p{
     width: 90%;
     height: 50px;
     display: block;
-    margin: 10em auto;
+    margin: 1em auto;
     font-size: 1.5rem;
     font-weight: bold;
     border-radius: 0.5em;
     cursor: pointer;
     background: #e5ff90;
+}
+
+.creating-account{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 30vh;
+}
+.creating-account img{
+    width: 200px;
+    border-radius: 2em;
+}
+.account-created{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+}
+
+.account-created p{
+    font-size: 2rem;
+    margin-top: 1.5em;
 }
