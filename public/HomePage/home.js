@@ -5,6 +5,30 @@ const sendBtn = document.getElementById("sendBtn")
 const msgInput = document.getElementById("msgInput")
 const chatBox = document.getElementById("chatBox")
 
+// 🕓 Load last 100 messages from Firebase in order
+db.ref("messages")
+  .orderByChild("timestamp")
+  .limitToLast(100)
+  .on("value", (snapshot) => {
+    chatBox.innerHTML = "";
+
+    snapshot.forEach((childSnapshot) => {
+      const data = childSnapshot.val();
+
+      const section = document.createElement("section");
+      section.classList.add("text-container");
+      section.innerHTML = `
+        <p class="user-name" style="color:${data.color}">@${data.name}</p>
+        <p class="user-text">${data.msg}</p>
+        <p class="text-time">${data.time || "⏰"}</p>`;
+
+      chatBox.append(section);
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+
 
 displayNav.innerHTML = `
     <nav>
@@ -31,10 +55,11 @@ socket.on("name-taken", () => {
   window.location.href = "../CreateAccount/createAcc.html"; // redirect back to signup
 });
 
-// When joined successfully
 socket.on("joined", (data) => {
   console.log(`✅ Joined as ${data.name} with color ${data.color}`);
+  localStorage.setItem("userColor", data.color);
 });
+
 
 
 
@@ -43,19 +68,37 @@ sendBtn.addEventListener("click", () => {
     if(!msg) return
     socket.emit("chat message", msg) // send msg to server
     msgInput.value = ""
+
+    // Show your message instantly (before Firebase reloads)
+    const section = document.createElement("section");
+    section.classList.add("text-container");
+    section.innerHTML = `
+    <p class="user-name" style="color:${localStorage.getItem("userColor") || "#ecea67"}">@${uName}</p>
+    <p class="user-text">${msg}</p>
+    <p class="text-time">${new Date().toLocaleTimeString()}</p>`;
+    chatBox.append(section);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
 })
 
 
 
-socket.on("chat message", (data) => {
+socket.on("chat-message", (data) => {
   const section = document.createElement("section");
   section.classList.add("text-container");
   section.innerHTML = `
-      <p class="user-name" style="color:${data.color}">@${data.name}</p>
-      <p class="user-text">${data.msg}</p>
-      <p class="text-time">${new Date().toLocaleTimeString()}</p>`;
+    <p class="user-name" style="color:${data.color}">@${data.name}</p>
+    <p class="user-text">${data.msg}</p>
+    <p class="text-time">${new Date().toLocaleTimeString()}</p>`;
+
   chatBox.append(section);
   chatBox.scrollTop = chatBox.scrollHeight;
+
+  // 🧠 Save message to Firebase
+    db.ref("messages").push({
+  ...data,
+  time: new Date().toLocaleTimeString(),
+  timestamp: Date.now()
 });
 
-
+});

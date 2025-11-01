@@ -24,22 +24,26 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="./home.js" type="module"></script>
+
+
+    <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUnn-l87Ysrpw7quKrDMsFtqsgTytK78g",
+    authDomain: "bit-chat-986cf.firebaseapp.com",
+    projectId: "bit-chat-986cf",
+    storageBucket: "bit-chat-986cf.firebasestorage.app",
+    messagingSenderId: "786964897005",
+    appId: "1:786964897005:web:3ec435706e3ca9ae88c0e4"
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 </body>
 </html>
-
-
-<!-- 
-
-          <section class="text-container">
-            <p class="user-name" style="color: #dc250d;">@Ninja🥷</p>
-                <p class="user-text">
-                    We definitely do. I'm a huge fan of BTC, and I personally store every bit of my cash in it. We can't trust the government here in Lebanon.
-                </p>
-                <p>What country are you in</p>
-                <span style="display: flex; align-items: center;">
-                    <p style="color: gainsboro; background: #2e3d00; width: fit-content; margin:0.5em 0;">@Gesamtkunstwerk</p>
-                    <p>?</p>
-                </span>
-                <p class="text-time">11:08:24</p>
-        </section>
--->
