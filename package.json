@@ -1,0 +1,26 @@
+{
+  "type": "module",
+  "name": "Bit-Chat",
+  "version": "1.0.0",
+  "description": "Building CSS skills through this app.",
+  "main": "createAcc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aminkhan-mid/Bit-Chat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aminkhan-mid/Bit-Chat/issues"
+  },
+  "homepage": "https://github.com/Aminkhan-mid/Bit-Chat#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}
