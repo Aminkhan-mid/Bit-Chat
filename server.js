@@ -5,7 +5,9 @@ import { Server } from "socket.io";
 import cors from "cors";
 import admin from "firebase-admin";
 
-// ====== Firebase Setup ======
+// =======================
+// 🔥 Firebase Setup
+// =======================
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
@@ -15,7 +17,9 @@ admin.initializeApp({
 
 const db = admin.database();
 
-// ====== Express + Socket.io Setup ======
+// =======================
+// ⚙️ Express + Socket.io Setup
+// =======================
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -30,11 +34,15 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// ====== User Tracking ======
+// =======================
+// 👥 User Tracking
+// =======================
 const users = {}; // { socketId: { name, color } }
 const nameColorMap = {}; // { name: color }
 
-// ====== Random Unique Color ======
+// =======================
+// 🎨 Random Unique Color
+// =======================
 function randomColor() {
   const colors = [
     "#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67",
@@ -47,7 +55,9 @@ function randomColor() {
     : colors[Math.floor(Math.random() * colors.length)];
 }
 
-// ====== Socket.io Logic ======
+// =======================
+// ⚡ Socket.io Logic
+// =======================
 io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
@@ -58,12 +68,11 @@ io.on("connection", (socket) => {
     .once("value", (snapshot) => {
       const messages = [];
       snapshot.forEach((child) => messages.push(child.val()));
-      // ✅ Sort so messages appear oldest → newest
       messages.sort((a, b) => a.timestamp - b.timestamp);
       socket.emit("load old messages", messages);
     });
 
-  // 🧍 Join logic
+  // 🧍 Handle user join
   socket.on("join", (userName) => {
     const nameTaken = Object.values(users).some(u => u.name === userName);
     if (nameTaken) {
@@ -82,7 +91,7 @@ io.on("connection", (socket) => {
     socket.emit("joined", { name: userName, color });
   });
 
-  // 💬 Handle messages
+  // 💬 Handle new chat messages
   socket.on("chat message", async (msg) => {
     const user = users[socket.id];
     if (!user) return;
@@ -91,15 +100,23 @@ io.on("connection", (socket) => {
       name: user.name,
       color: user.color,
       msg,
-      time: new Date().toLocaleTimeString(),
+      time: new Date().toLocaleTimeString("en-IN", { hour12: true }), // correct time format
       timestamp: Date.now()
     };
 
-    // ✅ Broadcast to all clients
-    io.emit("chat message", data);
+    io.emit("chat message", data); // broadcast live
+    await db.ref("messages").push(data); // save to Firebase
+  });
 
-    // ✅ Save to Firebase
-    await db.ref("messages").push(data);
+  // 🧹 Reset all chats (admin-triggered)
+  socket.on("reset chats", async () => {
+    try {
+      await db.ref("messages").remove();
+      io.emit("chats reset");
+      console.log("🔥 All chats deleted from Firebase");
+    } catch (error) {
+      console.error("❌ Error deleting chats:", error);
+    }
   });
 
   // 🔌 Handle disconnect
@@ -112,5 +129,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// ====== Start Server ======
+// =======================
+// 🚀 Start Server
+// =======================
 server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

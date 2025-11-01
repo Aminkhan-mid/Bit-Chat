@@ -90,3 +90,16 @@ function appendMessage(data) {
 
   chatBox.append(section);
 }
+
+
+
+resetChats.addEventListener("click", () => {
+  if (confirm("⚠️ Are you sure you want to delete all chats? This cannot be undone!")) {
+    socket.emit("reset chats");
+  }
+});
+
+socket.on("chats reset", () => {
+  chatBox.innerHTML = "";
+  alert("✅ All chats have been deleted!");
+});
