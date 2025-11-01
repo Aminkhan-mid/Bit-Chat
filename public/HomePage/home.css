@@ -49,6 +49,7 @@ section {
     margin-bottom: 0.5em;
 }
 .user-text{
+    font-family: 'Roboto Mono', sans-serif;
     margin-bottom: 0.5em;
     color: white;
     line-height: 1.5;
