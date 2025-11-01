@@ -44,7 +44,7 @@ displayNav.innerHTML = `
     </nav>
 `
 
-const socket = io()
+const socket = io("https://your-backend-name.onrender.com")
 // Tell server your username
 socket.emit("join", uName);
 
