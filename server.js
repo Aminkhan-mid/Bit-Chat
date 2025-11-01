@@ -1,10 +1,11 @@
-import "dotenv/config"
+import "dotenv/config";
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import admin from "firebase-admin";
 
+// ====== Firebase Setup ======
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
@@ -12,7 +13,9 @@ admin.initializeApp({
   databaseURL: "https://bit-chat-986cf-default-rtdb.asia-southeast1.firebasedatabase.app/"
 });
 
+const db = admin.database();
 
+// ====== Express + Socket.io Setup ======
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -27,14 +30,11 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-
-const db = admin.database();
-
-// 🧍 User tracking
+// ====== User Tracking ======
 const users = {}; // { socketId: { name, color } }
 const nameColorMap = {}; // { name: color }
 
-// 🎨 Function to give unique colors
+// ====== Random Unique Color ======
 function randomColor() {
   const colors = [
     "#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67",
@@ -47,19 +47,23 @@ function randomColor() {
     : colors[Math.floor(Math.random() * colors.length)];
 }
 
-// ⚡ Socket.io logic
+// ====== Socket.io Logic ======
 io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
-    // 🕓 Send last 100 messages when a user joins
-    const messagesRef = db.ref("messages").orderByChild("timestamp").limitToLast(100);
-    messagesRef.once("value", (snapshot) => {
-    const messages = [];
-    snapshot.forEach((child) => messages.push(child.val()));
-    socket.emit("load old messages", messages);
+  // 🕓 Send last 100 messages when a user joins (ordered by timestamp)
+  db.ref("messages")
+    .orderByChild("timestamp")
+    .limitToLast(100)
+    .once("value", (snapshot) => {
+      const messages = [];
+      snapshot.forEach((child) => messages.push(child.val()));
+      // ✅ Sort so messages appear oldest → newest
+      messages.sort((a, b) => a.timestamp - b.timestamp);
+      socket.emit("load old messages", messages);
     });
 
-
+  // 🧍 Join logic
   socket.on("join", (userName) => {
     const nameTaken = Object.values(users).some(u => u.name === userName);
     if (nameTaken) {
@@ -91,10 +95,14 @@ io.on("connection", (socket) => {
       timestamp: Date.now()
     };
 
-    io.emit("chat message", data); // broadcast live
-    await db.ref("messages").push(data); // ✅ save to Firebase
+    // ✅ Broadcast to all clients
+    io.emit("chat message", data);
+
+    // ✅ Save to Firebase
+    await db.ref("messages").push(data);
   });
 
+  // 🔌 Handle disconnect
   socket.on("disconnect", () => {
     const user = users[socket.id];
     if (user) {
@@ -104,4 +112,5 @@ io.on("connection", (socket) => {
   });
 });
 
+// ====== Start Server ======
 server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
