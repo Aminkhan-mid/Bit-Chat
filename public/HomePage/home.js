@@ -1,7 +1,6 @@
 const displayNav = document.getElementById("nav");
 const uSrc = localStorage.getItem("pfpSrc") || "No Pfp";
 const uName = localStorage.getItem("userName") || "Anonymous";
-const resetChats = document.getElementById("resetChats")
 const sendBtn = document.getElementById("sendBtn");
 const msgInput = document.getElementById("msgInput");
 const chatBox = document.getElementById("chatBox");
@@ -98,7 +97,7 @@ function appendMessage(data) {
 }
 
 
-
+const resetChats = document.getElementById("resetChats")
 resetChats.addEventListener("click", () => {
   if (confirm("⚠️ Are you sure you want to delete all chats? This cannot be undone!")) {
     socket.emit("reset chats");
