@@ -61,15 +61,31 @@ function randomColor() {
 io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
-  // 🕓 Send last 100 messages when a user joins (ordered by timestamp)
+// 🕓 Load and send recent 100 messages to newly connected user
 db.ref("messages")
   .orderByChild("timestamp")
   .limitToLast(100)
-  .once("value", snapshot => {
+  .once("value")
+  .then((snapshot) => {
+    if (!snapshot.exists()) {
+      console.log("⚠️ No messages found in Firebase.");
+      socket.emit("load old messages", []);
+      return;
+    }
+
     const messages = [];
-    snapshot.forEach(child => messages.push(child.val()));
-    messages.sort((a,b) => a.timestamp - b.timestamp);
+    snapshot.forEach((childSnapshot) => {
+      const msg = childSnapshot.val();
+      messages.push(msg);
+    });
+
+    console.log(`🔥 Loaded ${messages.length} messages from Firebase`);
+    messages.sort((a, b) => a.timestamp - b.timestamp);
+
     socket.emit("load old messages", messages);
+  })
+  .catch((err) => {
+    console.error("❌ Error loading messages:", err);
   });
 
 

@@ -3,7 +3,7 @@ const uSrc = localStorage.getItem("pfpSrc") || "No Pfp";
 const uName = localStorage.getItem("userName") || "Anonymous";
 const sendBtn = document.getElementById("sendBtn");
 const msgInput = document.getElementById("msgInput");
-const chatBox = document.getElementById("chatBox");
+
 
 // ✅ Connect to your deployed Socket.io server
 const socket = io("https://bit-chat-nmy3.onrender.com", {
@@ -37,7 +37,7 @@ socket.on("joined", (data) => {
   console.log(`✅ Joined as ${data.name} (${data.color})`);
   localStorage.setItem("userColor", data.color);
 });
-
+const chatBox = document.getElementById("chatBox");
 // ✉️ Send new message
 sendBtn.addEventListener("click", () => {
   const msg = msgInput.value.trim();
