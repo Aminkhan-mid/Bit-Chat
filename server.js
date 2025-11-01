@@ -26,11 +26,7 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// 🧠 Firebase setup
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://bit-chat-986cf-default-rtdb.asia-southeast1.firebasedatabase.app/"
-});
+
 const db = admin.database();
 
 // 🧍 User tracking
