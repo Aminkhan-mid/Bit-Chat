@@ -13,7 +13,7 @@ const nameColorMap = {}; // { name: color } to reuse same color
 
 // Function to generate random color
 function randomColor() {
-  const colors = ["#ecea67", "#dc250d", "#32e6e3", "#fca311", "#ecea67", "#00c851"];
+  const colors = ["#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67", "#00c851"];
   return colors[Math.floor(Math.random() * colors.length)];
 }
 

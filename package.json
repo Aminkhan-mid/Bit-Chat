@@ -3,7 +3,7 @@
   "name": "Bit-Chat",
   "version": "1.0.0",
   "description": "Building CSS skills through this app.",
-  "main": "createAcc.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "server.js"
