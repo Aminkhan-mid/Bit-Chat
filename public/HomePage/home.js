@@ -29,9 +29,6 @@ displayNav.innerHTML = `
   </nav>
 `;
 
-
-
-
 socket.on("name-taken", () => {
   alert("⚠️ This username is already taken! Choose another.");
   localStorage.removeItem("userName");
@@ -49,16 +46,23 @@ sendBtn.addEventListener("click", () => {
 
   socket.emit("chat message", msg);
   msgInput.value = "";
+});
 
-  const section = document.createElement("section");
-  section.classList.add("text-container");
-  section.innerHTML = `
-    <p class="user-name" style="color:${localStorage.getItem("userColor") || "#ecea67"}">@${uName}</p>
-    <p class="user-text">${msg}</p>
-    <p class="text-time">${new Date().toLocaleTimeString()}</p>`;
-  chatBox.append(section);
+socket.on("load old messages", (messages) => {
+  chatBox.innerHTML = "";
+  messages.forEach((data) => {
+    const section = document.createElement("section");
+    section.classList.add("text-container");
+    section.innerHTML = `
+      <p class="user-name" style="color:${data.color}">@${data.name}</p>
+      <p class="user-text">${data.msg}</p>
+      <p class="text-time">${data.time}</p>`;
+    chatBox.append(section);
+  });
   chatBox.scrollTop = chatBox.scrollHeight;
 });
+
+
 
 socket.on("chat message", (data) => {
   const section = document.createElement("section");

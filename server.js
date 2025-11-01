@@ -51,6 +51,15 @@ function randomColor() {
 io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
+    // 🕓 Send last 100 messages when a user joins
+    const messagesRef = db.ref("messages").orderByChild("timestamp").limitToLast(100);
+    messagesRef.once("value", (snapshot) => {
+    const messages = [];
+    snapshot.forEach((child) => messages.push(child.val()));
+    socket.emit("load old messages", messages);
+    });
+
+
   socket.on("join", (userName) => {
     const nameTaken = Object.values(users).some(u => u.name === userName);
     if (nameTaken) {
