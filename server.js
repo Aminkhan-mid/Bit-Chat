@@ -46,7 +46,7 @@ const nameColorMap = {};
 function randomColor() {
   const colors = [
     "#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67",
-    "#00c851", "#ffb703", "#8338ec", "#3a86ff", "#ff006e"
+    "#87B38D", "#ffb703", "#8338ec", "#3a86ff", "#ff006e"
   ];
   const usedColors = Object.values(users).map(u => u.color);
   const available = colors.filter(c => !usedColors.includes(c));
