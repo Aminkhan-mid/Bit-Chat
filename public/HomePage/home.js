@@ -45,9 +45,6 @@ sendBtn.addEventListener("click", () => {
     msgInput.value = ""
 })
 
-socket.on("connect", () => {
-  console.log("✅ Connected to server with ID:", socket.id);
-});
 
 
 socket.on("chat message", (data) => {
