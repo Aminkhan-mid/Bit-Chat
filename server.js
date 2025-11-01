@@ -3,7 +3,14 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://bit-chat-986cf-default-rtdb.asia-southeast1.firebasedatabase.app/"
+});
+
 
 const app = express();
 const server = http.createServer(app);
