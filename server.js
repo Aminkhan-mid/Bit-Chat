@@ -5,40 +5,52 @@ import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-
+const PORT = process.env.PORT || 3000
 app.use(express.static("public"));
 
 const users = {}; // { socketId: { name, color } }
 const nameColorMap = {}; // { name: color } to reuse same color
 
-// Function to generate random color
+// Function to generate a unique color for each user
 function randomColor() {
-  const colors = ["#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67", "#00c851"];
+  const colors = ["#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67", "#00c851", "#ffb703", "#8338ec", "#3a86ff", "#ff006e"];
+  
+  // Get all colors currently being used
+  const usedColors = Object.values(users).map(u => u.color);
+  
+  // Filter to get unused colors
+  const available = colors.filter(c => !usedColors.includes(c));
+  
+  // Pick from available colors or fallback to any color if all used
+  if (available.length > 0) {
+    return available[Math.floor(Math.random() * available.length)];
+  }
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
 io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
-  // When a user joins with a name
   socket.on("join", (userName) => {
-    // Check if username already exists
     const nameTaken = Object.values(users).some(u => u.name === userName);
     if (nameTaken) {
       socket.emit("name-taken");
       return;
     }
 
-    // Assign color (reuse if known)
-    const color = nameColorMap[userName] || randomColor();
-    nameColorMap[userName] = color;
+    // Get color (reuse if user reconnected)
+    let color = nameColorMap[userName];
+    if (!color) {
+      color = randomColor();
+      nameColorMap[userName] = color;
+    }
 
-    // Save user
     users[socket.id] = { name: userName, color };
 
     console.log(`👤 ${userName} joined with color ${color}`);
     socket.emit("joined", { name: userName, color });
   });
+
 
   // When chat message received
   socket.on("chat message", (msg) => {
@@ -58,4 +70,4 @@ io.on("connection", (socket) => {
 
 
 
-server.listen(3000, () => console.log("✅ Server running on http://localhost:3000"));
+server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
