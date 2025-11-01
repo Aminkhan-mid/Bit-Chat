@@ -49,15 +49,26 @@ sendBtn.addEventListener("click", () => {
 
 // 🕓 Load old messages (from Firebase via server)
 socket.on("load old messages", (messages) => {
-  console.log("🕓 Loading old messages:", messages.length);
   chatBox.innerHTML = "";
-
-  messages.forEach((data) => {
-    appendMessage(data);
-  });
-
+  messages
+    .sort((a,b) => a.timestamp - b.timestamp)
+    .forEach(data => {
+      const section = document.createElement("section");
+      section.classList.add("text-container");
+      const localTime = new Date(data.timestamp).toLocaleTimeString("en-IN", {
+        hour12: true,
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      section.innerHTML = `
+        <p class="user-name" style="color:${data.color}">@${data.name}</p>
+        <p class="user-text">${data.msg}</p>
+        <p class="text-time">${localTime}</p>`;
+      chatBox.append(section);
+    });
   chatBox.scrollTop = chatBox.scrollHeight;
 });
+
 
 // 💬 Receive new chat messages
 socket.on("chat message", (data) => {

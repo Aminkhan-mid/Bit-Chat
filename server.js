@@ -62,15 +62,16 @@ io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
   // 🕓 Send last 100 messages when a user joins (ordered by timestamp)
-  db.ref("messages")
-    .orderByChild("timestamp")
-    .limitToLast(100)
-    .once("value", (snapshot) => {
-      const messages = [];
-      snapshot.forEach((child) => messages.push(child.val()));
-      messages.sort((a, b) => a.timestamp - b.timestamp);
-      socket.emit("load old messages", messages);
-    });
+db.ref("messages")
+  .orderByChild("timestamp")
+  .limitToLast(100)
+  .once("value", snapshot => {
+    const messages = [];
+    snapshot.forEach(child => messages.push(child.val()));
+    messages.sort((a,b) => a.timestamp - b.timestamp);
+    socket.emit("load old messages", messages);
+  });
+
 
   // 🧍 Handle user join
   socket.on("join", (userName) => {
