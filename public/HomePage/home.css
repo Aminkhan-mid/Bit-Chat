@@ -13,7 +13,6 @@ nav{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #A52422;
     margin: 1em;
 }
 nav span{
