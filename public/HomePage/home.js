@@ -1,11 +1,12 @@
 const displayNav = document.getElementById("nav");
-const uSrc = localStorage.getItem("pfpSrc") || "No Pfp";
-const uName = localStorage.getItem("userName") || "Anonymous";
+const chatBox = document.getElementById("chatBox");
 const sendBtn = document.getElementById("sendBtn");
 const msgInput = document.getElementById("msgInput");
 
+const uSrc = localStorage.getItem("pfpSrc") || "No Pfp";
+const uName = localStorage.getItem("userName") || "Anonymous";
 
-// ✅ Connect to your deployed Socket.io server
+// ✅ Connect to Socket.io server
 const socket = io("https://bit-chat-nmy3.onrender.com", {
   transports: ["websocket"]
 });
@@ -15,30 +16,41 @@ socket.on("connect", () => {
   socket.emit("join", uName);
 });
 
-// 🧭 Display top navigation
+// 🧭 Navigation bar
 displayNav.innerHTML = `
   <nav>
     <span>
       <img class="uSrc" src="${uSrc}" alt="pfp">
       <p>/ @${uName}</p>
     </span>
-      <button id="resetChats">Reset</button>
+    <button id="resetChats">Reset</button>
   </nav>
 `;
 
+const resetChats = document.getElementById("resetChats");
+resetChats.addEventListener("click", () => {
+  if (confirm("⚠️ Are you sure you want to delete all chats?")) {
+    socket.emit("reset chats");
+  }
+});
+
+socket.on("chats reset", () => {
+  chatBox.innerHTML = "";
+  alert("✅ All chats deleted!");
+});
 
 socket.on("name-taken", () => {
-  alert("⚠️ This username is already taken! Choose another.");
+  alert("⚠️ This username is already taken!");
   localStorage.removeItem("userName");
   window.location.href = "../CreateAccount/createAcc.html";
 });
 
 socket.on("joined", (data) => {
-  console.log(`✅ Joined as ${data.name} (${data.color})`);
+  console.log(`✅ Joined as ${data.name}`);
   localStorage.setItem("userColor", data.color);
 });
-const chatBox = document.getElementById("chatBox");
-// ✉️ Send new message
+
+// ✉️ Send message
 sendBtn.addEventListener("click", () => {
   const msg = msgInput.value.trim();
   if (!msg) return;
@@ -46,42 +58,28 @@ sendBtn.addEventListener("click", () => {
   msgInput.value = "";
 });
 
-// 🕓 Load old messages (from Firebase via server)
+// 🕓 Load old messages
 socket.on("load old messages", (messages) => {
   chatBox.innerHTML = "";
-  messages
-    .sort((a,b) => a.timestamp - b.timestamp)
-    .forEach(data => {
-      const section = document.createElement("section");
-      section.classList.add("text-container");
-      const localTime = new Date(data.timestamp).toLocaleTimeString("en-IN", {
-        hour12: true,
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-      section.innerHTML = `
-        <p class="user-name" style="color:${data.color}">@${data.name}</p>
-        <p class="user-text">${data.msg}</p>
-        <p class="text-time">${localTime}</p>`;
-      chatBox.append(section);
-    });
+  messages.sort((a, b) => a.timestamp - b.timestamp)
+    .forEach(data => appendMessage(data));
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-
-// 💬 Receive new chat messages
+// 💬 Receive new message
 socket.on("chat message", (data) => {
   appendMessage(data);
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-// 🧩 Helper function to render a message
+// 🧩 Render message
 function appendMessage(data) {
   const section = document.createElement("section");
   section.classList.add("text-container");
+  section.dataset.id = data.id;
+  section.dataset.name = data.name;
 
-  // 🕒 Convert UTC time to local
-  const localTime = new Date(data.timestamp).toLocaleTimeString([], {
+  const localTime = new Date(data.timestamp).toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true
@@ -93,18 +91,42 @@ function appendMessage(data) {
     <p class="text-time">${localTime}</p>
   `;
 
+  // 👇 Long press to show delete button (for own messages)
+  if (data.name === uName) {
+    let pressTimer;
+    section.addEventListener("mousedown", () => {
+      pressTimer = setTimeout(() => {
+        showDeleteButton(section, data.id);
+      }, 1200);
+    });
+    section.addEventListener("mouseup", () => clearTimeout(pressTimer));
+    section.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+  }
+
   chatBox.append(section);
 }
 
+// 🗑 Create and show delete button
+function showDeleteButton(section, msgId) {
+  if (section.querySelector(".delete-btn")) return;
+  const delBtn = document.createElement("button");
+  delBtn.classList.add("delete-btn");
+  delBtn.textContent = "🗑 Delete";
 
-const resetChats = document.getElementById("resetChats")
-resetChats.addEventListener("click", () => {
-  if (confirm("⚠️ Are you sure you want to delete all chats? This cannot be undone!")) {
-    socket.emit("reset chats");
-  }
-});
+  delBtn.addEventListener("click", () => {
+    if (confirm("Delete this message?")) {
+      socket.emit("delete message", msgId);
+    }
+  });
 
-socket.on("chats reset", () => {
-  chatBox.innerHTML = "";
-  alert("✅ All chats have been deleted!");
+  section.append(delBtn);
+
+  // Auto-hide after 4s
+  setTimeout(() => delBtn.remove(), 4000);
+}
+
+// 🔔 When a message is deleted
+socket.on("message deleted", (msgId) => {
+  const msg = document.querySelector(`[data-id="${msgId}"]`);
+  if (msg) msg.remove();
 });

@@ -24,7 +24,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // allow all frontends (Render + GitHub)
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -37,8 +37,8 @@ const PORT = process.env.PORT || 3000;
 // =======================
 // 👥 User Tracking
 // =======================
-const users = {}; // { socketId: { name, color } }
-const nameColorMap = {}; // { name: color }
+const users = {};
+const nameColorMap = {};
 
 // =======================
 // 🎨 Random Unique Color
@@ -61,33 +61,25 @@ function randomColor() {
 io.on("connection", (socket) => {
   console.log("🥳 A user connected!");
 
-// 🕓 Load and send recent 100 messages to newly connected user
-db.ref("messages")
-  .orderByChild("timestamp")
-  .limitToLast(100)
-  .once("value")
-  .then((snapshot) => {
-    if (!snapshot.exists()) {
-      console.log("⚠️ No messages found in Firebase.");
-      socket.emit("load old messages", []);
-      return;
-    }
+  // 🕓 Load and send last 100 messages
+  db.ref("messages")
+    .orderByChild("timestamp")
+    .limitToLast(100)
+    .once("value")
+    .then((snapshot) => {
+      if (!snapshot.exists()) {
+        socket.emit("load old messages", []);
+        return;
+      }
 
-    const messages = [];
-    snapshot.forEach((childSnapshot) => {
-      const msg = childSnapshot.val();
-      messages.push(msg);
-    });
+      const messages = [];
+      snapshot.forEach((childSnapshot) => {
+        messages.push({ id: childSnapshot.key, ...childSnapshot.val() });
+      });
 
-    console.log(`🔥 Loaded ${messages.length} messages from Firebase`);
-    messages.sort((a, b) => a.timestamp - b.timestamp);
-
-    socket.emit("load old messages", messages);
-  })
-  .catch((err) => {
-    console.error("❌ Error loading messages:", err);
-  });
-
+      socket.emit("load old messages", messages);
+    })
+    .catch((err) => console.error("❌ Error loading messages:", err));
 
   // 🧍 Handle user join
   socket.on("join", (userName) => {
@@ -104,11 +96,10 @@ db.ref("messages")
     }
 
     users[socket.id] = { name: userName, color };
-    console.log(`👤 ${userName} joined with color ${color}`);
     socket.emit("joined", { name: userName, color });
   });
 
-  // 💬 Handle new chat messages
+  // 💬 New chat message
   socket.on("chat message", async (msg) => {
     const user = users[socket.id];
     if (!user) return;
@@ -117,32 +108,41 @@ db.ref("messages")
       name: user.name,
       color: user.color,
       msg,
-      time: new Date().toLocaleTimeString("en-IN", { hour12: true }), // correct time format
+      time: new Date().toLocaleTimeString("en-IN", { hour12: true }),
       timestamp: Date.now()
     };
 
-    io.emit("chat message", data); // broadcast live
-    await db.ref("messages").push(data); // save to Firebase
+    const ref = await db.ref("messages").push(data);
+    const messageWithId = { id: ref.key, ...data };
+    io.emit("chat message", messageWithId);
   });
 
-  // 🧹 Reset all chats (admin-triggered)
+  // 🧹 Reset all chats
   socket.on("reset chats", async () => {
     try {
       await db.ref("messages").remove();
       io.emit("chats reset");
-      console.log("🔥 All chats deleted from Firebase");
-    } catch (error) {
-      console.error("❌ Error deleting chats:", error);
+      console.log("🔥 All chats deleted");
+    } catch (err) {
+      console.error("❌ Error deleting chats:", err);
     }
   });
 
-  // 🔌 Handle disconnect
+  // 🗑 Delete single chat message
+  socket.on("delete message", async (msgId) => {
+    try {
+      await db.ref(`messages/${msgId}`).remove();
+      io.emit("message deleted", msgId);
+      console.log(`🗑 Message ${msgId} deleted`);
+    } catch (err) {
+      console.error("❌ Error deleting message:", err);
+    }
+  });
+
+  // 🔌 Disconnect
   socket.on("disconnect", () => {
     const user = users[socket.id];
-    if (user) {
-      console.log(`🔌 ${user.name} disconnected`);
-      delete users[socket.id];
-    }
+    if (user) delete users[socket.id];
   });
 });
 
