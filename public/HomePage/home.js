@@ -44,7 +44,14 @@ displayNav.innerHTML = `
     </nav>
 `
 
-const socket = io("https://your-backend-name.onrender.com")
+const socket = io("https://bit-chat-nmy3.onrender.com", {
+  transports: ["websocket"]
+})
+io.on("connection", (socket) => {
+  console.log("🥳 A user connected from", socket.handshake.headers.origin);
+});
+
+
 // Tell server your username
 socket.emit("join", uName);
 
