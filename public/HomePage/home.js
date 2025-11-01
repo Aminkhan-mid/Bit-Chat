@@ -83,7 +83,7 @@ sendBtn.addEventListener("click", () => {
 
 
 
-socket.on("chat-message", (data) => {
+socket.on("chat message", (data) => {
   const section = document.createElement("section");
   section.classList.add("text-container");
   section.innerHTML = `
