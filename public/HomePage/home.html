@@ -22,29 +22,27 @@
         </div>
     </div>
 
-   
-
-
         <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js"></script>
+<!-- ✅ Correct Firebase v8 scripts (non-module) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyAUnn-l87Ysrpw7quKrDMsFtqsgTytK78g",
-        authDomain: "bit-chat-986cf.firebaseapp.com",
-        projectId: "bit-chat-986cf",
-        storageBucket: "bit-chat-986cf.firebasestorage.app",
-        messagingSenderId: "786964897005",
-        appId: "1:786964897005:web:3ec435706e3ca9ae88c0e4",
-        databaseURL: "https://bit-chat-986cf-default-rtdb.firebaseio.com"
-    };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    </script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUnn-l87Ysrpw7quKrDMsFtqsgTytK78g",
+    authDomain: "bit-chat-986cf.firebaseapp.com",
+    projectId: "bit-chat-986cf",
+    storageBucket: "bit-chat-986cf.firebasestorage.app",
+    messagingSenderId: "786964897005",
+    appId: "1:786964897005:web:3ec435706e3ca9ae88c0e4",
+    databaseURL: "https://bit-chat-986cf-default-rtdb.asia-southeast1.firebasedatabase.app"
+  };
 
+  // ✅ Initialize Firebase (v8 style)
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 
 
     <script src="/socket.io/socket.io.js"></script>
