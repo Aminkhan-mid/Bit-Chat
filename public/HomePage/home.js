@@ -5,40 +5,20 @@ const sendBtn = document.getElementById("sendBtn");
 const msgInput = document.getElementById("msgInput");
 const chatBox = document.getElementById("chatBox");
 
-// ✅ Only one socket connection
-const socket = io("https://bit-chat-nmy3.onrender.com", { transports: ["websocket"] });
+// ✅ Connect to your Render server (only once)
+const socket = io("https://bit-chat-nmy3.onrender.com", {
+  transports: ["websocket"]
+});
 
 socket.on("connect", () => {
   console.log("🥳 Connected to server!");
 });
 
-// 🕓 Load last 100 messages from Firebase
-db.ref("messages")
-  .orderByChild("timestamp")
-  .limitToLast(100)
-  .on("value", (snapshot) => {
-    chatBox.innerHTML = "";
-
-    snapshot.forEach((childSnapshot) => {
-      const data = childSnapshot.val();
-
-      const section = document.createElement("section");
-      section.classList.add("text-container");
-      section.innerHTML = `
-        <p class="user-name" style="color:${data.color}">@${data.name}</p>
-        <p class="user-text">${data.msg}</p>
-        <p class="text-time">${data.time || "⏰"}</p>`;
-
-      chatBox.append(section);
-    });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-  });
-
+// 🧭 Build top nav
 displayNav.innerHTML = `
   <nav>
     <span>
-      <img class="uSrc" src="${uSrc}" alt="skull">
+      <img class="uSrc" src="${uSrc}" alt="pfp">
       <p>/ @${uName}</p>
     </span>
     <div>
@@ -52,18 +32,40 @@ displayNav.innerHTML = `
 // 🧑‍💻 Tell server your username
 socket.emit("join", uName);
 
-// Handle if name is taken
+// 🚫 If username already taken
 socket.on("name-taken", () => {
   alert("⚠️ This username is already taken! Choose another.");
   localStorage.removeItem("userName");
   window.location.href = "../CreateAccount/createAcc.html";
 });
 
+// ✅ When successfully joined
 socket.on("joined", (data) => {
   console.log(`✅ Joined as ${data.name} with color ${data.color}`);
   localStorage.setItem("userColor", data.color);
 });
 
+// 🕓 Load last 100 messages ONCE (not live)
+db.ref("messages")
+  .orderByChild("timestamp")
+  .limitToLast(100)
+  .once("value")
+  .then((snapshot) => {
+    chatBox.innerHTML = "";
+    snapshot.forEach((childSnapshot) => {
+      const data = childSnapshot.val();
+      const section = document.createElement("section");
+      section.classList.add("text-container");
+      section.innerHTML = `
+        <p class="user-name" style="color:${data.color}">@${data.name}</p>
+        <p class="user-text">${data.msg}</p>
+        <p class="text-time">${data.time || "⏰"}</p>`;
+      chatBox.append(section);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+// 📨 Send message
 sendBtn.addEventListener("click", () => {
   const msg = msgInput.value.trim();
   if (!msg) return;
@@ -71,7 +73,7 @@ sendBtn.addEventListener("click", () => {
   socket.emit("chat message", msg);
   msgInput.value = "";
 
-  // Show message instantly
+  // show instantly
   const section = document.createElement("section");
   section.classList.add("text-container");
   section.innerHTML = `
@@ -82,7 +84,7 @@ sendBtn.addEventListener("click", () => {
   chatBox.scrollTop = chatBox.scrollHeight;
 });
 
-// When new message arrives
+// 💬 Receive message from others
 socket.on("chat message", (data) => {
   const section = document.createElement("section");
   section.classList.add("text-container");
@@ -94,10 +96,10 @@ socket.on("chat message", (data) => {
   chatBox.append(section);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  // Save message to Firebase
+  // 💾 Save message to Firebase
   db.ref("messages").push({
     ...data,
     time: new Date().toLocaleTimeString(),
-    timestamp: Date.now()
+    timestamp: Date.now(),
   });
 });
