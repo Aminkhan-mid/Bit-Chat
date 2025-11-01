@@ -23,9 +23,7 @@ displayNav.innerHTML = `
       <img class="uSrc" src="${uSrc}" alt="pfp">
       <p>/ @${uName}</p>
     </span>
-    <div>
       <button id="resetChats">Reset</button>
-    </div>
   </nav>
 `;
 
