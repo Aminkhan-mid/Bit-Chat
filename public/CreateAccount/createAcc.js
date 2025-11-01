@@ -47,7 +47,7 @@ function showAccountCreated() {
     <div class="account-created">
       <img class="selected-icon" src="${selectedIconSrc}" alt="${selectedIconAlt}">
       <p>@${usernameInput.value}</p>
-      <h2>Account Created 🥳</h2>
+      <h2 class="alertAccCreated">Account Created 🥳</h2>
     </div>`;
     localStorage.setItem("userName", usernameInput.value)
 }

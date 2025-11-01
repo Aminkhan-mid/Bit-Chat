@@ -122,3 +122,8 @@ span p{
     font-size: 2rem;
     margin-top: 1em;
 }
+
+.alertAccCreated{
+    margin-top: 1em;
+    font-size: 1.4rem;
+}
