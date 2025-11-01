@@ -9,28 +9,11 @@ const socket = io("https://bit-chat-nmy3.onrender.com", {
   transports: ["websocket"]
 });
 
-// ✅ Load last 100 messages once from Firebase
-db.ref("messages")
-  .orderByChild("timestamp")
-  .limitToLast(100)
-  .once("value")
-  .then((snapshot) => {
-    chatBox.innerHTML = "";
+socket.on("connect", () => {
+  console.log("🥳 Connected to Render!");
+  socket.emit("join", uName);
+});
 
-    snapshot.forEach((childSnapshot) => {
-      const data = childSnapshot.val();
-
-      const section = document.createElement("section");
-      section.classList.add("text-container");
-      section.innerHTML = `
-        <p class="user-name" style="color:${data.color}">@${data.name}</p>
-        <p class="user-text">${data.msg}</p>
-        <p class="text-time">${data.time || "⏰"}</p>`;
-      chatBox.append(section);
-    });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-  });
 
 displayNav.innerHTML = `
   <nav>
@@ -46,11 +29,8 @@ displayNav.innerHTML = `
   </nav>
 `;
 
-socket.on("connect", () => {
-  console.log("🥳 Connected to Render!");
-});
 
-socket.emit("join", uName);
+
 
 socket.on("name-taken", () => {
   alert("⚠️ This username is already taken! Choose another.");
