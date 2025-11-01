@@ -30,6 +30,7 @@ nav .uSrc{
 nav p{
     font-size: 1rem;
     margin-top:4px;
+    color: #00ff44;
 }
 nav div{
     padding: 1em;
@@ -105,15 +106,36 @@ input{
     font-weight: bold;
 }
 
+
+/* ✨ Fade-out animation for message deletion */
+.fade-out {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Delete button styling */
 .delete-btn {
-  background: #ff4d4d;
-  color: white;
+  background: #ff4b4b;
+  color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 4px 10px;
-  margin-top: 5px;
-  cursor: pointer;
-  transition: 0.2s ease;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+  z-index: 10;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.text-container {
+  position: relative;
 }
 
 .delete-btn:hover {

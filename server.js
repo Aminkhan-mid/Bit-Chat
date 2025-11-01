@@ -1,152 +1,147 @@
-import "dotenv/config";
-import express from "express";
-import http from "http";
-import { Server } from "socket.io";
-import cors from "cors";
-import admin from "firebase-admin";
+const displayNav = document.getElementById("nav");
+const chatBox = document.getElementById("chatBox");
+const sendBtn = document.getElementById("sendBtn");
+const msgInput = document.getElementById("msgInput");
 
-// =======================
-// 🔥 Firebase Setup
-// =======================
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+const uSrc = localStorage.getItem("pfpSrc") || "No Pfp";
+const uName = localStorage.getItem("userName") || "Anonymous";
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://bit-chat-986cf-default-rtdb.asia-southeast1.firebasedatabase.app/"
+// ✅ Connect to Socket.io server
+const socket = io("https://bit-chat-nmy3.onrender.com", {
+  transports: ["websocket"]
 });
 
-const db = admin.database();
+socket.on("connect", () => {
+  console.log("🥳 Connected to Render!");
+  socket.emit("join", uName);
+});
 
-// =======================
-// ⚙️ Express + Socket.io Setup
-// =======================
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+// 🧭 Navigation bar
+displayNav.innerHTML = `
+  <nav>
+    <span>
+      <img class="uSrc" src="${uSrc}" alt="pfp">
+      <p>/ @${uName}</p>
+    </span>
+    <button id="resetChats">Reset</button>
+  </nav>
+`;
+
+// 🧹 Reset all chats
+const resetChats = document.getElementById("resetChats");
+resetChats.addEventListener("click", () => {
+  if (confirm("⚠️ Are you sure you want to delete all chats?")) {
+    socket.emit("reset chats");
   }
 });
 
-app.use(cors());
-app.use(express.static("public"));
-
-const PORT = process.env.PORT || 3000;
-
-// =======================
-// 👥 User Tracking
-// =======================
-const users = {};
-const nameColorMap = {};
-
-// =======================
-// 🎨 Random Unique Color
-// =======================
-function randomColor() {
-  const colors = [
-    "#E85D75", "#CAF0F8", "#D96C06", "#fca311", "#ecea67",
-    "#00c851", "#ffb703", "#8338ec", "#3a86ff", "#ff006e"
-  ];
-  const usedColors = Object.values(users).map(u => u.color);
-  const available = colors.filter(c => !usedColors.includes(c));
-  return available.length > 0
-    ? available[Math.floor(Math.random() * available.length)]
-    : colors[Math.floor(Math.random() * colors.length)];
-}
-
-// =======================
-// ⚡ Socket.io Logic
-// =======================
-io.on("connection", (socket) => {
-  console.log("🥳 A user connected!");
-
-  // 🕓 Load and send last 100 messages
-  db.ref("messages")
-    .orderByChild("timestamp")
-    .limitToLast(100)
-    .once("value")
-    .then((snapshot) => {
-      if (!snapshot.exists()) {
-        socket.emit("load old messages", []);
-        return;
-      }
-
-      const messages = [];
-      snapshot.forEach((childSnapshot) => {
-        messages.push({ id: childSnapshot.key, ...childSnapshot.val() });
-      });
-
-      socket.emit("load old messages", messages);
-    })
-    .catch((err) => console.error("❌ Error loading messages:", err));
-
-  // 🧍 Handle user join
-  socket.on("join", (userName) => {
-    const nameTaken = Object.values(users).some(u => u.name === userName);
-    if (nameTaken) {
-      socket.emit("name-taken");
-      return;
-    }
-
-    let color = nameColorMap[userName];
-    if (!color) {
-      color = randomColor();
-      nameColorMap[userName] = color;
-    }
-
-    users[socket.id] = { name: userName, color };
-    socket.emit("joined", { name: userName, color });
-  });
-
-  // 💬 New chat message
-  socket.on("chat message", async (msg) => {
-    const user = users[socket.id];
-    if (!user) return;
-
-    const data = {
-      name: user.name,
-      color: user.color,
-      msg,
-      time: new Date().toLocaleTimeString("en-IN", { hour12: true }),
-      timestamp: Date.now()
-    };
-
-    const ref = await db.ref("messages").push(data);
-    const messageWithId = { id: ref.key, ...data };
-    io.emit("chat message", messageWithId);
-  });
-
-  // 🧹 Reset all chats
-  socket.on("reset chats", async () => {
-    try {
-      await db.ref("messages").remove();
-      io.emit("chats reset");
-      console.log("🔥 All chats deleted");
-    } catch (err) {
-      console.error("❌ Error deleting chats:", err);
-    }
-  });
-
-  // 🗑 Delete single chat message
-  socket.on("delete message", async (msgId) => {
-    try {
-      await db.ref(`messages/${msgId}`).remove();
-      io.emit("message deleted", msgId);
-      console.log(`🗑 Message ${msgId} deleted`);
-    } catch (err) {
-      console.error("❌ Error deleting message:", err);
-    }
-  });
-
-  // 🔌 Disconnect
-  socket.on("disconnect", () => {
-    const user = users[socket.id];
-    if (user) delete users[socket.id];
-  });
+socket.on("chats reset", () => {
+  chatBox.innerHTML = "";
+  alert("✅ All chats deleted!");
 });
 
-// =======================
-// 🚀 Start Server
-// =======================
-server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+// 🧍 User handling
+socket.on("name-taken", () => {
+  alert("⚠️ This username is already taken!");
+  localStorage.removeItem("userName");
+  window.location.href = "../CreateAccount/createAcc.html";
+});
+
+socket.on("joined", (data) => {
+  console.log(`✅ Joined as ${data.name}`);
+  localStorage.setItem("userColor", data.color);
+});
+
+// ✉️ Send message
+sendBtn.addEventListener("click", () => {
+  const msg = msgInput.value.trim();
+  if (!msg) return;
+  socket.emit("chat message", msg);
+  msgInput.value = "";
+});
+
+// 🕓 Load old messages
+socket.on("load old messages", (messages) => {
+  chatBox.innerHTML = "";
+  messages.sort((a, b) => a.timestamp - b.timestamp)
+    .forEach(data => appendMessage(data));
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+// 💬 Receive new message
+socket.on("chat message", (data) => {
+  appendMessage(data);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+// 🧩 Render message
+function appendMessage(data) {
+  const section = document.createElement("section");
+  section.classList.add("text-container");
+  section.dataset.id = data.id;
+  section.dataset.name = data.name;
+
+  const localTime = new Date(data.timestamp).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+
+  section.innerHTML = `
+    <p class="user-name" style="color:${data.color}">@${data.name}</p>
+    <p class="user-text">${data.msg}</p>
+    <p class="text-time">${localTime}</p>
+  `;
+
+  // 👇 Long-press (mobile) to show delete button if it's your own message
+  if (data.name === uName) {
+    let pressTimer;
+
+    // For touch (mobile)
+    section.addEventListener("touchstart", () => {
+      pressTimer = setTimeout(() => {
+        showDeleteButton(section, data.id);
+      }, 1000); // hold for 1 second
+    });
+    section.addEventListener("touchend", () => clearTimeout(pressTimer));
+
+    // For desktop (optional fallback)
+    section.addEventListener("mousedown", () => {
+      pressTimer = setTimeout(() => {
+        showDeleteButton(section, data.id);
+      }, 1000);
+    });
+    section.addEventListener("mouseup", () => clearTimeout(pressTimer));
+    section.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+  }
+
+  chatBox.append(section);
+}
+
+// 🗑 Create and show delete button
+function showDeleteButton(section, msgId) {
+  if (section.querySelector(".delete-btn")) return;
+  const delBtn = document.createElement("button");
+  delBtn.classList.add("delete-btn");
+  delBtn.textContent = "🗑 Delete";
+
+  delBtn.addEventListener("click", () => {
+    if (confirm("Delete this message?")) {
+      socket.emit("delete message", msgId);
+    }
+  });
+
+  section.append(delBtn);
+
+  // Auto-hide after 4s
+  setTimeout(() => delBtn.remove(), 4000);
+}
+
+// 🔔 When a message is deleted
+socket.on("message deleted", (msgId) => {
+  const msg = document.querySelector(`[data-id="${msgId}"]`);
+  if (msg) {
+    msg.classList.add("fade-out");
+    setTimeout(() => msg.remove(), 400); // remove after animation ends
+  }
+});

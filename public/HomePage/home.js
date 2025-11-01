@@ -27,6 +27,7 @@ displayNav.innerHTML = `
   </nav>
 `;
 
+// 🧹 Reset all chats
 const resetChats = document.getElementById("resetChats");
 resetChats.addEventListener("click", () => {
   if (confirm("⚠️ Are you sure you want to delete all chats?")) {
@@ -39,6 +40,7 @@ socket.on("chats reset", () => {
   alert("✅ All chats deleted!");
 });
 
+// 🧍 User handling
 socket.on("name-taken", () => {
   alert("⚠️ This username is already taken!");
   localStorage.removeItem("userName");
@@ -91,13 +93,25 @@ function appendMessage(data) {
     <p class="text-time">${localTime}</p>
   `;
 
-  // 👇 Long press to show delete button (for own messages)
+  // 👇 Long-press to show delete button (for your own messages)
   if (data.name === uName) {
     let pressTimer;
+
+    // Mobile long press
+    section.addEventListener("touchstart", () => {
+      pressTimer = setTimeout(() => {
+        hideAllDeleteButtons(); // hide others
+        showDeleteButton(section, data.id);
+      }, 800); // hold 0.8s
+    });
+    section.addEventListener("touchend", () => clearTimeout(pressTimer));
+
+    // Optional desktop support
     section.addEventListener("mousedown", () => {
       pressTimer = setTimeout(() => {
+        hideAllDeleteButtons();
         showDeleteButton(section, data.id);
-      }, 1200);
+      }, 800);
     });
     section.addEventListener("mouseup", () => clearTimeout(pressTimer));
     section.addEventListener("mouseleave", () => clearTimeout(pressTimer));
@@ -125,8 +139,28 @@ function showDeleteButton(section, msgId) {
   setTimeout(() => delBtn.remove(), 4000);
 }
 
+// ❌ Hide all visible delete buttons
+function hideAllDeleteButtons() {
+  document.querySelectorAll(".delete-btn").forEach(btn => btn.remove());
+}
+
+// 🪄 Hide delete buttons if user taps elsewhere
+document.addEventListener("touchstart", (e) => {
+  if (!e.target.classList.contains("delete-btn")) {
+    hideAllDeleteButtons();
+  }
+});
+document.addEventListener("mousedown", (e) => {
+  if (!e.target.classList.contains("delete-btn")) {
+    hideAllDeleteButtons();
+  }
+});
+
 // 🔔 When a message is deleted
 socket.on("message deleted", (msgId) => {
   const msg = document.querySelector(`[data-id="${msgId}"]`);
-  if (msg) msg.remove();
+  if (msg) {
+    msg.classList.add("fade-out");
+    setTimeout(() => msg.remove(), 400);
+  }
 });
