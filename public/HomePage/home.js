@@ -1,6 +1,7 @@
 const displayNav = document.getElementById("nav");
 const uSrc = localStorage.getItem("pfpSrc") || "No Pfp";
 const uName = localStorage.getItem("userName") || "Anonymous";
+const resetChats = document.getElementById("resetChats")
 const sendBtn = document.getElementById("sendBtn");
 const msgInput = document.getElementById("msgInput");
 const chatBox = document.getElementById("chatBox");
@@ -26,9 +27,11 @@ displayNav.innerHTML = `
       <img src="../imgs/stash--save-ribbon-solid.png" alt="saved">
       <img src="../imgs/jam--world.png" alt="world"> 
       <img src="../imgs/icon-park-solid--peoples-two.png" alt="users"> 
+      <button id="resetChats">Reset</button>
     </div>
   </nav>
 `;
+
 
 socket.on("name-taken", () => {
   alert("⚠️ This username is already taken! Choose another.");
